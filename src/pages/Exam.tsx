@@ -13,6 +13,8 @@ export default function Exam() {
   const [examTitle, setExamTitle] = useState('Ujian Sumatif Akhir Jenjang');
   const [isStarted, setIsStarted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isViolated, setIsViolated] = useState(false);
+  const [violationCount, setViolationCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,9 +29,46 @@ export default function Exam() {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
+    const handleVisibilityChange = () => {
+      if (isStarted && document.visibilityState === 'hidden') {
+        triggerViolation();
+      }
+    };
+
+    const handleBlur = () => {
+      if (isStarted) {
+        triggerViolation();
+      }
+    };
+
+    const handleResize = () => {
+      // Detect split screen or floating window by checking aspect ratio or sudden changes
+      if (isStarted && isFullscreen) {
+        // If window size changes significantly while in fullscreen, it might be an overlay or split screen
+        // In most browsers, fullscreen window size matches screen size.
+      }
+    };
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isStarted, isFullscreen]);
+
+  const triggerViolation = () => {
+    setIsViolated(true);
+    setViolationCount((prev) => prev + 1);
+    toast.error('Pelanggaran Terdeteksi!', {
+      description: 'Layar terkunci. Hubungi pengawas.',
+    });
+  };
 
   const startExam = async () => {
     if (!examUrl) {
@@ -43,17 +82,22 @@ export default function Exam() {
         setIsStarted(true);
       }
     } catch (err) {
-      toast.error('Gagal masuk ke mode layar penuh. Pastikan browser mendukung.');
-      // Still start even if fullscreen fails in some environments
+      toast.error('Gagal masuk ke mode layar penuh.');
       setIsStarted(true);
     }
   };
 
   const exitExam = () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+    const pass = prompt('Masukkan Password Pengawas untuk keluar:');
+    if (pass === 'guru123') {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+      setIsStarted(false);
+      setIsViolated(false);
+    } else {
+      alert('Password Salah!');
     }
-    setIsStarted(false);
   };
 
   if (!isStarted) {
@@ -104,7 +148,7 @@ export default function Exam() {
               </div>
               
               <div className="bg-zinc-50 p-4 border-t border-zinc-100 flex justify-between items-center">
-                <p className="text-xs text-zinc-400">Exambro v1.0 • SMPN 1 Manonjaya</p>
+                <p className="text-xs text-zinc-400">Exambro v1.1 • SMPN 1 Manonjaya</p>
                 <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-zinc-900" onClick={() => navigate('/settings')}>
                   <SettingsIcon className="w-4 h-4 mr-2" />
                   Pengaturan Guru
@@ -118,47 +162,47 @@ export default function Exam() {
   }
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col" ref={containerRef}>
+    <div className="fixed inset-0 bg-white z-50 flex flex-col select-none" ref={containerRef} onContextMenu={(e) => e.preventDefault()}>
       {/* Security Monitoring */}
-      <SecurityOverlay onReset={() => {}} />
+      <SecurityOverlay 
+        isViolated={isViolated} 
+        setIsViolated={setIsViolated} 
+        violationCount={violationCount}
+        onReset={() => {
+          if (containerRef.current && !document.fullscreenElement) {
+            containerRef.current.requestFullscreen().catch(() => {});
+          }
+        }} 
+      />
 
-      {/* Header Bar (Optional, can be hidden for more space) */}
-      <div className="h-12 bg-zinc-900 text-white flex items-center justify-between px-4 shrink-0">
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-green-400" />
-          <span className="text-sm font-bold tracking-tight uppercase">{schoolName} - EXAMBRO</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-[10px] font-mono uppercase tracking-widest">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Sistem Terpantau
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 text-white hover:bg-white/10"
-            onClick={exitExam}
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Keluar
-          </Button>
-        </div>
-      </div>
+      {/* Header Bar - Minimized for security */}
+      <div className="h-1 bg-zinc-900 shrink-0" />
 
       {/* Exam Content */}
       <div className="flex-1 relative bg-zinc-100">
-        {!isFullscreen && isStarted && (
-          <div className="absolute inset-0 z-40 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 text-center">
+        {!isFullscreen && isStarted && !isViolated && (
+          <div className="absolute inset-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-6 text-center">
             <div className="max-w-md space-y-6">
-              <Maximize2 className="w-16 h-16 text-white mx-auto animate-bounce" />
-              <h2 className="text-2xl font-bold text-white">Mode Layar Penuh Diperlukan</h2>
-              <p className="text-zinc-400">Anda harus berada dalam mode layar penuh untuk mengerjakan ujian.</p>
-              <Button onClick={() => containerRef.current?.requestFullscreen()} className="bg-white text-black hover:bg-zinc-200">
+              <div className="p-4 bg-red-500/20 rounded-full w-fit mx-auto">
+                <Maximize2 className="w-12 h-12 text-red-500 animate-pulse" />
+              </div>
+              <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Mode Layar Penuh Diperlukan</h2>
+              <p className="text-zinc-400">Anda dilarang keluar dari mode layar penuh selama ujian berlangsung.</p>
+              <Button onClick={() => containerRef.current?.requestFullscreen()} className="bg-white text-black hover:bg-zinc-200 h-12 px-8 font-bold">
                 Kembali ke Layar Penuh
               </Button>
+              <p className="text-[10px] text-zinc-600">Pelanggaran akan dicatat jika Anda sengaja keluar.</p>
             </div>
           </div>
         )}
+        
+        {/* Hidden Exit Button - Top Right Corner (Long Press / Multiple Clicks) */}
+        <div 
+          className="absolute top-0 right-0 w-12 h-12 z-30 opacity-0 hover:opacity-10 cursor-default"
+          onDoubleClick={exitExam}
+          title="Teacher Only"
+        />
+
         <iframe 
           src={examUrl} 
           className="w-full h-full border-none"
