@@ -36,31 +36,44 @@ export default function Exam() {
     };
 
     const handleBlur = () => {
-      if (isStarted) {
+      if (isStarted && !isViolated) {
         triggerViolation();
       }
     };
 
+    const handleFocus = () => {
+      // If they come back, and they were violated, make sure the overlay is still there
+      if (isStarted && isViolated) {
+        // Re-request fullscreen to trap them again
+        containerRef.current?.requestFullscreen().catch(() => {});
+      }
+    };
+
     const handleResize = () => {
-      // Detect split screen or floating window by checking aspect ratio or sudden changes
+      // Detect split screen or floating window
       if (isStarted && isFullscreen) {
-        // If window size changes significantly while in fullscreen, it might be an overlay or split screen
-        // In most browsers, fullscreen window size matches screen size.
+        const threshold = 50; // px
+        if (Math.abs(window.innerWidth - screen.width) > threshold || 
+            Math.abs(window.innerHeight - screen.height) > threshold) {
+          triggerViolation();
+        }
       }
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     window.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
     window.addEventListener('resize', handleResize);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
       window.removeEventListener('resize', handleResize);
     };
-  }, [isStarted, isFullscreen]);
+  }, [isStarted, isFullscreen, isViolated]);
 
   const triggerViolation = () => {
     setIsViolated(true);
