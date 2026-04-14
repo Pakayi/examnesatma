@@ -18,12 +18,14 @@ export default function Exam() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedUrl = localStorage.getItem('exambro_url');
-    const savedSchool = localStorage.getItem('exambro_school');
-    const savedTitle = localStorage.getItem('exambro_title');
-    if (savedUrl) setExamUrl(savedUrl);
-    if (savedSchool) setSchoolName(savedSchool);
-    if (savedTitle) setExamTitle(savedTitle);
+    const defaultUrl = 'https://pakayi.github.io/portalsaj/';
+    const savedUrl = localStorage.getItem('exambro_url') || defaultUrl;
+    const savedSchool = localStorage.getItem('exambro_school') || 'SMPN 1 Manonjaya';
+    const savedTitle = localStorage.getItem('exambro_title') || 'Ujian Sumatif Akhir Jenjang';
+    
+    setExamUrl(savedUrl);
+    setSchoolName(savedSchool);
+    setExamTitle(savedTitle);
 
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
