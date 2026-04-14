@@ -36,23 +36,22 @@ export default function Exam() {
     };
 
     const handleBlur = () => {
-      if (isStarted && !isViolated) {
-        triggerViolation();
-      }
+      // Removed triggerViolation from blur to prevent false positives 
+      // when interacting with the iframe or browser UI.
+      // visibilitychange is more reliable for app switching.
     };
 
     const handleFocus = () => {
-      // If they come back, and they were violated, make sure the overlay is still there
       if (isStarted && isViolated) {
-        // Re-request fullscreen to trap them again
         containerRef.current?.requestFullscreen().catch(() => {});
       }
     };
 
     const handleResize = () => {
       // Detect split screen or floating window
+      // Only trigger if the change is significant and we are started
       if (isStarted && isFullscreen) {
-        const threshold = 50; // px
+        const threshold = 100; // Increased threshold to 100px
         if (Math.abs(window.innerWidth - screen.width) > threshold || 
             Math.abs(window.innerHeight - screen.height) > threshold) {
           triggerViolation();
