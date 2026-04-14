@@ -1,0 +1,6 @@
+{
+  "name": "Exambro SMPN 1 Manonjaya",
+  "description": "A secure exam browser application for SMPN 1 Manonjaya with configurable exam links and anti-cheat features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
