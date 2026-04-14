@@ -16,6 +16,34 @@ export default function Exam() {
   const [isViolated, setIsViolated] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const alarmAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Alarm sound for Fullscreen Required
+  useEffect(() => {
+    const shouldPlayAlarm = !isFullscreen && isStarted && !isViolated;
+    
+    if (shouldPlayAlarm) {
+      if (!alarmAudioRef.current) {
+        alarmAudioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3');
+        alarmAudioRef.current.loop = true;
+        alarmAudioRef.current.volume = 1.0;
+      }
+      alarmAudioRef.current.play().catch(() => {
+        console.log("Audio play blocked. Interaction required.");
+      });
+    } else {
+      if (alarmAudioRef.current) {
+        alarmAudioRef.current.pause();
+        alarmAudioRef.current.currentTime = 0;
+      }
+    }
+
+    return () => {
+      if (alarmAudioRef.current) {
+        alarmAudioRef.current.pause();
+      }
+    };
+  }, [isFullscreen, isStarted, isViolated]);
 
   useEffect(() => {
     const savedUrl = localStorage.getItem('exambro_url');
@@ -193,17 +221,27 @@ export default function Exam() {
       {/* Exam Content */}
       <div className="flex-1 relative bg-zinc-100">
         {!isFullscreen && isStarted && !isViolated && (
-          <div className="absolute inset-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-6 text-center">
-            <div className="max-w-md space-y-6">
-              <div className="p-4 bg-red-500/20 rounded-full w-fit mx-auto">
-                <Maximize2 className="w-12 h-12 text-red-500 animate-pulse" />
+          <div className="absolute inset-0 z-40 bg-red-600 flex items-center justify-center p-6 text-center overflow-hidden">
+            {/* Flashing Background */}
+            <motion.div 
+              animate={{ opacity: [0.1, 0.5, 0.1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+              className="absolute inset-0 bg-black"
+            />
+            
+            <div className="relative max-w-md space-y-6">
+              <div className="p-6 bg-white rounded-full w-fit mx-auto shadow-xl animate-bounce">
+                <Maximize2 className="w-12 h-12 text-red-600" />
               </div>
-              <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Mode Layar Penuh Diperlukan</h2>
-              <p className="text-zinc-400">Anda dilarang keluar dari mode layar penuh selama ujian berlangsung.</p>
-              <Button onClick={() => containerRef.current?.requestFullscreen()} className="bg-white text-black hover:bg-zinc-200 h-12 px-8 font-bold">
-                Kembali ke Layar Penuh
+              <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">MODE LAYAR PENUH WAJIB!</h2>
+              <p className="text-white/80 font-bold">ALARM AKTIF: Anda dilarang keluar dari mode layar penuh selama ujian.</p>
+              <Button 
+                onClick={() => containerRef.current?.requestFullscreen()} 
+                className="bg-white text-black hover:bg-zinc-200 h-16 px-10 font-black text-xl rounded-2xl shadow-2xl active:scale-95 transition-transform"
+              >
+                KEMBALI KE LAYAR PENUH
               </Button>
-              <p className="text-[10px] text-zinc-600">Pelanggaran akan dicatat jika Anda sengaja keluar.</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Sistem Keamanan SMPN 1 Manonjaya</p>
             </div>
           </div>
         )}
