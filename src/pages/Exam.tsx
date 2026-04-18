@@ -116,37 +116,50 @@ export default function Exam() {
 
   if (!isStarted) {
     return (
-      <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6" ref={containerRef}>
-        <div className="w-full max-w-2xl space-y-8 text-center">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-black tracking-tight text-zinc-900 uppercase">{schoolName}</h1>
-            <p className="text-xl text-zinc-500 font-medium">{examTitle}</p>
+      <div className="min-h-screen bg-linear-to-br from-blue-700 via-blue-800 to-indigo-950 flex flex-col items-center justify-center p-6 relative overflow-hidden" ref={containerRef}>
+        {/* Decorative background elements */}
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-3xl" />
+
+        <div className="w-full max-w-2xl space-y-8 text-center relative z-10">
+          <div className="space-y-3">
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white uppercase drop-shadow-lg">
+              {schoolName}
+            </h1>
+            <div className="h-1 w-24 bg-blue-400 mx-auto rounded-full" />
+            <p className="text-xl text-blue-100 font-medium tracking-wide drop-shadow-md">
+              {examTitle}
+            </p>
           </div>
 
-          <Card className="border-zinc-200 shadow-xl overflow-hidden bg-white">
+          <Card className="border-white/10 shadow-2xl overflow-hidden bg-white/95 backdrop-blur-sm rounded-3xl">
             <CardContent className="p-0">
-              <div className="p-8 space-y-6">
+              <div className="p-10 space-y-8">
                 <div className="flex justify-center">
-                  <div className="w-20 h-20 bg-zinc-900 rounded-3xl flex items-center justify-center text-white shadow-lg">
-                    <ShieldCheck className="w-10 h-10" />
+                  <div className="w-24 h-24 bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center text-white shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                    <ShieldCheck className="w-12 h-12" />
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold">Siap Memulai Ujian?</h2>
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-zinc-800">Siap Memulai Ujian?</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                    <div className="flex items-start gap-3 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
-                      <Maximize2 className="w-5 h-5 text-zinc-400 mt-0.5" />
+                    <div className="flex items-start gap-3 p-5 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Maximize2 className="w-5 h-5 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-semibold text-sm">Layar Penuh</p>
-                        <p className="text-xs text-zinc-500">Ujian akan berjalan dalam mode layar penuh.</p>
+                        <p className="font-bold text-sm text-zinc-900 leading-tight">Layar Penuh</p>
+                        <p className="text-xs text-zinc-600 mt-1">Sistem akan mengunci layar secara otomatis.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
-                      <Info className="w-5 h-5 text-zinc-400 mt-0.5" />
+                    <div className="flex items-start gap-3 p-5 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                      <div className="p-2 bg-blue-100 rounded-lg">
+                        <Info className="w-5 h-5 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-semibold text-sm">Anti-Curang</p>
-                        <p className="text-xs text-zinc-500">Pindah tab atau aplikasi akan terdeteksi.</p>
+                        <p className="font-bold text-sm text-zinc-900 leading-tight">Sistem Keamanan</p>
+                        <p className="text-xs text-zinc-600 mt-1">Dilarang berpindah aplikasi selama ujian.</p>
                       </div>
                     </div>
                   </div>
@@ -154,18 +167,18 @@ export default function Exam() {
 
                 <Button 
                   size="lg" 
-                  className="w-full h-14 text-xl font-bold bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-all active:scale-95"
+                  className="w-full h-16 text-xl font-black bg-linear-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-2xl transition-all shadow-xl hover:shadow-blue-500/20 active:scale-95 border-b-4 border-indigo-900/30"
                   onClick={startExam}
                 >
                   MULAI UJIAN SEKARANG
                 </Button>
               </div>
               
-              <div className="bg-zinc-50 p-4 border-t border-zinc-100 flex justify-between items-center">
-                <p className="text-xs text-zinc-400">Exambro v1.1 • SMPN 1 Manonjaya</p>
-                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-zinc-900" onClick={() => navigate('/settings')}>
+              <div className="bg-zinc-50/50 p-4 border-t border-zinc-100 flex justify-between items-center px-8">
+                <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Exambro v1.3 • SMPN 1 Manonjaya</p>
+                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => navigate('/settings')}>
                   <SettingsIcon className="w-4 h-4 mr-2" />
-                  Pengaturan Guru
+                  <span className="text-xs font-semibold uppercase tracking-wider">Akses Guru</span>
                 </Button>
               </div>
             </CardContent>
