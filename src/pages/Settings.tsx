@@ -18,7 +18,7 @@ export default function Settings() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const defaultUrl = 'https://pakayi.github.io/portalsaj/';
+    const defaultUrl = 'https://ayifauzi21-cyber.github.io/portalsajbk26/';
     const savedUrl = localStorage.getItem('exambro_url') || defaultUrl;
     const savedSchool = localStorage.getItem('exambro_school') || 'SMPN 1 Manonjaya';
     const savedTitle = localStorage.getItem('exambro_title') || 'Ujian Sumatif Akhir Jenjang';
