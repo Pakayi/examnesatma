@@ -16,6 +16,30 @@ export default function Exam() {
   const [isViolated, setIsViolated] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const wakeLockRef = useRef<any>(null);
+
+  const requestWakeLock = async () => {
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+        console.log('Wake Lock is active');
+      } catch (err) {
+        console.error(`${(err as Error).name}, ${(err as Error).message}`);
+      }
+    }
+  };
+
+  const releaseWakeLock = async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release();
+        wakeLockRef.current = null;
+        console.log('Wake Lock released');
+      } catch (err) {
+        console.error(`${(err as Error).name}, ${(err as Error).message}`);
+      }
+    }
+  };
 
   useEffect(() => {
     const defaultUrl = 'https://ayifauzi21-cyber.github.io/portalsajbk26/';
@@ -31,9 +55,14 @@ export default function Exam() {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
-    const handleVisibilityChange = () => {
-      if (isStarted && document.visibilityState === 'hidden') {
-        triggerViolation();
+    const handleVisibilityChange = async () => {
+      if (isStarted) {
+        if (document.visibilityState === 'hidden') {
+          triggerViolation();
+        } else if (document.visibilityState === 'visible') {
+          // Re-request wake lock if tab becomes visible again
+          await requestWakeLock();
+        }
       }
     };
 
@@ -67,12 +96,17 @@ export default function Exam() {
     window.addEventListener('focus', handleFocus);
     window.addEventListener('resize', handleResize);
 
+    if (isStarted && !isViolated) {
+      requestWakeLock();
+    }
+
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('resize', handleResize);
+      releaseWakeLock();
     };
   }, [isStarted, isFullscreen, isViolated]);
 
