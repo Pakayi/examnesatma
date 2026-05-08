@@ -202,11 +202,10 @@ export default function Exam() {
         }} 
       />
 
-      {/* Header Bar - Minimized for security */}
-      <div className="h-1 bg-zinc-900 shrink-0" />
+      {/* Header Bar - Removed for total fullscreen in v1.4 */}
 
       {/* Exam Content */}
-      <div className="flex-1 relative bg-zinc-100">
+      <div className="flex-1 relative bg-white">
         {!isFullscreen && isStarted && !isViolated && (
           <div className="absolute inset-0 z-40 bg-black/90 backdrop-blur-md flex items-center justify-center p-6 text-center">
             <div className="max-w-md space-y-6">
@@ -223,18 +222,18 @@ export default function Exam() {
           </div>
         )}
         
-        {/* Hidden Exit Button - Top Right Corner (Long Press / Multiple Clicks) */}
+        {/* Hidden Exit Button - Top Right Corner (Double Click) */}
         <div 
-          className="absolute top-0 right-0 w-12 h-12 z-30 opacity-0 hover:opacity-10 cursor-default"
+          className="absolute top-0 right-0 w-16 h-16 z-30 opacity-0 cursor-default"
           onDoubleClick={exitExam}
-          title="Teacher Only"
         />
 
         <iframe 
           src={examUrl} 
-          className="w-full h-full border-none"
+          className="w-full h-full border-none absolute inset-0"
           title="Exam Content"
-          allow="geolocation; microphone; camera"
+          allow="geolocation; microphone; camera; fullscreen; display-capture"
+          allowFullScreen
         />
       </div>
     </div>
