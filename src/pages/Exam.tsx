@@ -10,7 +10,7 @@ export default function Exam() {
   const navigate = useNavigate();
   const [examUrl, setExamUrl] = useState('');
   const [schoolName, setSchoolName] = useState('SMPN 1 Manonjaya');
-  const [examTitle, setExamTitle] = useState('Ujian Sumatif Akhir Jenjang');
+  const [examTitle, setExamTitle] = useState('Ujian Sumatif Akhir Tahun');
   const [isStarted, setIsStarted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isViolated, setIsViolated] = useState(false);
@@ -18,10 +18,10 @@ export default function Exam() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const defaultUrl = 'https://ayifauzi21-cyber.github.io/portalsajbk26/';
+    const defaultUrl = 'https://ayifauzi21-cyber.github.io/portalasatbk/';
     const savedUrl = localStorage.getItem('exambro_url') || defaultUrl;
     const savedSchool = localStorage.getItem('exambro_school') || 'SMPN 1 Manonjaya';
-    const savedTitle = localStorage.getItem('exambro_title') || 'Ujian Sumatif Akhir Jenjang';
+    const savedTitle = localStorage.getItem('exambro_title') || 'Ujian Sumatif Akhir Tahun';
     
     setExamUrl(savedUrl);
     setSchoolName(savedSchool);
